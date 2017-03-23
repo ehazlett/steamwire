@@ -16,11 +16,13 @@ for x in $OS; do
             continue
         fi
         mv ./cmd/steamwire/steamwire* ${TMPDIR}/${x}/${a}/
-        zip -D -r ${TMPDIR}/steamwire-${VERSION}-${x}-${a}.zip ${TMPDIR}/${x}/${a}/ > /dev/null 2>&1
+        dst=$(pwd)/${TMPDIR}/steamwire-${VERSION}-${x}-${a}.zip
+        pushd ${TMPDIR}/${x}/${a} > /dev/null
+        zip -r ${dst} .
         if [ $? -ne 0 ]; then
-            echo " ERR: packaging build for ${x} ${a}"
-            continue
+            echo " ERR: packaging build for ${dst}"
         fi
+        popd > /dev/null
     done
 
     # cleanup

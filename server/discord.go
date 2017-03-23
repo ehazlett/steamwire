@@ -35,7 +35,9 @@ func (s *Server) sendToDiscord(item *NewsItem) error {
 		return err
 	}
 	logrus.WithFields(logrus.Fields{
-		"message":        msg,
+		"appID":          item.AppID,
+		"title":          item.Title,
+		"gid":            item.Gid,
 		"discordChannel": s.config.DiscordChannelID,
 	}).Debug("sending to discord")
 

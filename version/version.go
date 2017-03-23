@@ -4,7 +4,8 @@ var (
 	name        = "steamwire"
 	version     = "0.1.0"
 	description = "steam application news updates"
-	gitCommit   = "HEAD"
+	// GitCommit is used to inject the current commit into the version
+	GitCommit = "HEAD"
 )
 
 // Name returns the name of the application
@@ -14,7 +15,7 @@ func Name() string {
 
 // Version returns the version including GitCommit
 func Version() string {
-	return version + " (" + gitCommit + ")"
+	return version + " (" + GitCommit + ")"
 }
 
 // Description returns the application description
