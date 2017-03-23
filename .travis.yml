@@ -7,5 +7,4 @@ install:
   - go get -u github.com/golang/lint/golint
 
 script:
-  - make check
   - make test

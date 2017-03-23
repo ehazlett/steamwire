@@ -15,7 +15,7 @@ build:
 build-static:
 	@cd cmd/$(APP) && go build -a -tags "netgo static_build" -installsuffix netgo -ldflags "-w -X github.com/ehazlett/$(APP)/version.GitCommit=$(COMMIT)" .
 
-test:
+test: check
 	@go test -v $(DEPS)
 
 check:

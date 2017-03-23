@@ -9,7 +9,7 @@ func TestGenerateMessage(t *testing.T) {
 		AppID:    1234,
 		Gid:      "testingGID",
 		Title:    "Test Title",
-		Url:      "http://example.com/test",
+		URL:      "http://example.com/test",
 		Author:   "ehazlett",
 		Contents: "This is a test message",
 	}
