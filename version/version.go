@@ -2,7 +2,7 @@ package version
 
 var (
 	name        = "steamwire"
-	version     = "0.1.0"
+	version     = "0.2.0"
 	description = "steam application news updates"
 	// GitCommit is used to inject the current commit into the version
 	GitCommit = "HEAD"
