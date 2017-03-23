@@ -1,0 +1,11 @@
+language: go
+
+go:
+  - 1.7.x
+
+install:
+  - go get -u github.com/golang/lint/golint
+
+script:
+  - make check
+  - make test

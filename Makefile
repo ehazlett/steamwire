@@ -18,7 +18,8 @@ build-static:
 test:
 	@go test -v $(DEPS)
 
-lint:
+check:
+	@go vet -v $(DEPS)
 	@golint $(DEPS)
 
 clean:
