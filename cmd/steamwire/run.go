@@ -24,7 +24,7 @@ func runAction(c *cli.Context) error {
 		logrus.Info("  ************************************************************************************")
 	}
 
-	cfg := &server.ServerConfig{
+	cfg := &server.Config{
 		ListenAddr:       c.GlobalString("listen-addr"),
 		UpdateInterval:   c.GlobalDuration("update-interval"),
 		DBPath:           c.GlobalString("db-path"),

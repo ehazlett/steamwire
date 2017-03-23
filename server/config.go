@@ -2,7 +2,8 @@ package server
 
 import "time"
 
-type ServerConfig struct {
+// Config is the configuration for the server
+type Config struct {
 	ListenAddr       string
 	DBPath           string
 	UpdateInterval   time.Duration

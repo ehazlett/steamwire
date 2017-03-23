@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Run starts the server
 func (s *Server) Run() error {
 	globalMux := http.NewServeMux()
 	r, err := s.router()

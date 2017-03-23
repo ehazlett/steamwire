@@ -12,14 +12,16 @@ const (
 	dbBucketName = "apps"
 )
 
+// Server is the object for the core server
 type Server struct {
-	config     *ServerConfig
+	config     *Config
 	db         *bolt.DB
 	updateChan chan (*NewsItem)
 	discord    *discordgo.Session
 }
 
-func NewServer(cfg *ServerConfig) (*Server, error) {
+// NewServer returns a new `Server`
+func NewServer(cfg *Config) (*Server, error) {
 	db, err := bolt.Open(cfg.DBPath, 0600, &bolt.Options{Timeout: 2 * time.Second})
 	if err != nil {
 		return nil, err

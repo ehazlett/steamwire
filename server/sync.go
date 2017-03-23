@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Sync gets the latest news item for all applications in the database
 func (s *Server) Sync() error {
 	apps, err := s.GetApps()
 	if err != nil {
