@@ -3,12 +3,13 @@ package server
 import (
 	"sync"
 
+	"github.com/ehazlett/steamwire/types"
 	"github.com/sirupsen/logrus"
 )
 
-// Sync gets the latest news item for all applications in the database
-func (s *Server) Sync() error {
-	apps, err := s.GetApps()
+// sync gets the latest news item for all applications in the database
+func (s *Server) sync() error {
+	apps, err := s.ds.GetApps()
 	if err != nil {
 		return err
 	}
@@ -23,10 +24,10 @@ func (s *Server) Sync() error {
 	return nil
 }
 
-func (s *Server) updateNewsForApp(appID string, wg *sync.WaitGroup, ch chan (*NewsItem)) {
+func (s *Server) updateNewsForApp(appID string, wg *sync.WaitGroup, ch chan (*types.NewsItem)) {
 	defer wg.Done()
 
-	appNews, err := s.GetNews(appID)
+	appNews, err := s.getNews(appID)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"appID": appID,
@@ -41,7 +42,7 @@ func (s *Server) updateNewsForApp(appID string, wg *sync.WaitGroup, ch chan (*Ne
 		return
 	}
 
-	current, err := s.GetAppIndex(appID)
+	current, err := s.ds.GetAppIndex(appID)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"appID": appID,
@@ -58,7 +59,7 @@ func (s *Server) updateNewsForApp(appID string, wg *sync.WaitGroup, ch chan (*Ne
 		}).Debug("news for app is current")
 		return
 	}
-	if err := s.UpdateAppIndex(appID, item.Gid); err != nil {
+	if err := s.ds.UpdateAppIndex(appID, item.Gid); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"appID": appID,
 			"gid":   item.Gid,

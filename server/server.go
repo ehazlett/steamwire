@@ -1,43 +1,36 @@
 package server
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/boltdb/bolt"
 	"github.com/bwmarrin/discordgo"
-)
-
-const (
-	dbBucketName = "apps"
+	"github.com/ehazlett/steamwire/db"
+	"github.com/ehazlett/steamwire/types"
 )
 
 // Server is the object for the core server
 type Server struct {
-	config     *Config
-	db         *bolt.DB
-	updateChan chan (*NewsItem)
-	discord    *discordgo.Session
+	config      *Config
+	ds          *db.DB
+	updateChan  chan (*types.NewsItem)
+	discord     *discordgo.Session
+	discordUser *discordgo.User
 }
 
 // NewServer returns a new `Server`
 func NewServer(cfg *Config) (*Server, error) {
-	db, err := bolt.Open(cfg.DBPath, 0600, &bolt.Options{Timeout: 2 * time.Second})
+	bdb, err := bolt.Open(cfg.DBPath, 0600, &bolt.Options{Timeout: 2 * time.Second})
 	if err != nil {
 		return nil, err
 	}
 
-	// ensure bucket is created
-	if err := db.Update(func(tx *bolt.Tx) error {
-		if _, err := tx.CreateBucketIfNotExists([]byte(dbBucketName)); err != nil {
-			return fmt.Errorf("error creating bucket: %s", err)
-		}
-		return nil
-	}); err != nil {
+	ds, err := db.NewDB(bdb)
+	if err != nil {
 		return nil, err
 	}
 
-	ch := make(chan *NewsItem)
+	ch := make(chan *types.NewsItem)
 
 	var discord *discordgo.Session
 	if cfg.DiscordToken != "" {
@@ -55,7 +48,7 @@ func NewServer(cfg *Config) (*Server, error) {
 
 	return &Server{
 		config:     cfg,
-		db:         db,
+		ds:         ds,
 		updateChan: ch,
 		discord:    discord,
 	}, nil

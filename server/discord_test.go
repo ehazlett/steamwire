@@ -2,10 +2,12 @@ package server
 
 import (
 	"testing"
+
+	"github.com/ehazlett/steamwire/types"
 )
 
 func TestGenerateMessage(t *testing.T) {
-	item := &NewsItem{
+	item := &types.NewsItem{
 		AppID:    1234,
 		Gid:      "testingGID",
 		Title:    "Test Title",
@@ -23,9 +25,9 @@ func TestGenerateMessage(t *testing.T) {
 
 This is a test message
 
-[Read more](http://example.com/test)
+Read more: http://example.com/test
 
-[Application Page](http://store.steampowered.com/app/1234/)
+Application Page: http://store.steampowered.com/app/1234/
 `
 
 	if msg != expected {

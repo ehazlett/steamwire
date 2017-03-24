@@ -33,7 +33,7 @@ func (s *Server) Run() error {
 			logrus.WithFields(logrus.Fields{
 				"date": time.Now(),
 			}).Info("updating news")
-			s.Sync()
+			s.sync()
 		}
 	}()
 
@@ -48,6 +48,17 @@ func (s *Server) Run() error {
 			}
 		}
 	}()
+
+	if s.discord != nil {
+		user, err := s.discord.User("@me")
+		if err != nil {
+			return err
+		}
+		s.discordUser = user
+
+		// add handler
+		s.discord.AddHandler(s.messageCreateHandler)
+	}
 
 	if err := srv.ListenAndServe(); err != nil {
 		return err

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"html/template"
 
+	"github.com/ehazlett/steamwire/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -12,13 +13,13 @@ const (
 
 {{.Contents}}
 
-[Read more]({{.URL}})
+Read more: {{.URL}}
 
-[Application Page](http://store.steampowered.com/app/{{.AppID}}/)
+Application Page: http://store.steampowered.com/app/{{.AppID}}/
 `
 )
 
-func generateMessage(item *NewsItem) (string, error) {
+func generateMessage(item *types.NewsItem) (string, error) {
 	t := template.Must(template.New("message").Parse(msgTmpl))
 	buf := &bytes.Buffer{}
 
@@ -29,7 +30,12 @@ func generateMessage(item *NewsItem) (string, error) {
 	return msg, nil
 }
 
-func (s *Server) sendToDiscord(item *NewsItem) error {
+func (s *Server) sendToDiscord(item *types.NewsItem) error {
+	if s.discord == nil {
+		logrus.Warnf("discord is not configured; skipping send")
+		return nil
+	}
+
 	msg, err := generateMessage(item)
 	if err != nil {
 		return err
@@ -41,7 +47,15 @@ func (s *Server) sendToDiscord(item *NewsItem) error {
 		"discordChannel": s.config.DiscordChannelID,
 	}).Debug("sending to discord")
 
-	if _, err := s.discord.ChannelMessageSend(s.config.DiscordChannelID, msg); err != nil {
+	if err := s.sendDiscordMessage(msg); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Server) sendDiscordMessage(content string) error {
+	if _, err := s.discord.ChannelMessageSend(s.config.DiscordChannelID, content); err != nil {
 		return err
 	}
 
