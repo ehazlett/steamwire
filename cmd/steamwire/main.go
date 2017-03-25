@@ -42,11 +42,6 @@ func main() {
 			Usage: "Path to database",
 			Value: getDefaultDBPath(),
 		},
-		cli.StringFlag{
-			Name:  "listen-addr, l",
-			Usage: "Listen address",
-			Value: ":8080",
-		},
 		cli.DurationFlag{
 			Name:  "update-interval, i",
 			Usage: "Update interval",

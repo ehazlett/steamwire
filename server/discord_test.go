@@ -21,14 +21,7 @@ func TestGenerateMessage(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `**Test Title** by ehazlett
-
-This is a test message
-
-Read more: http://example.com/test
-
-Application Page: http://store.steampowered.com/app/1234/
-`
+	expected := `This is a test message Read more: http://example.com/test Application Page: http://store.steampowered.com/app/1234/`
 
 	if msg != expected {
 		t.Fatalf("expected message: %s\n\nreceived: %s", expected, msg)

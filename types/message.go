@@ -14,6 +14,10 @@ const (
 	MessageTypeList MessageType = "list"
 	// MessageTypeSearch is for searching apps
 	MessageTypeSearch MessageType = "search"
+	// MessageTypeSync is for syncing
+	MessageTypeSync MessageType = "sync"
+	// MessageTypeAnnounce is for announcing app news
+	MessageTypeAnnounce MessageType = "announce"
 	// MessageTypeHelp is for help
 	MessageTypeHelp MessageType = "help"
 )

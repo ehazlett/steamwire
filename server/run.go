@@ -1,7 +1,6 @@
 package server
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -9,23 +8,6 @@ import (
 
 // Run starts the server
 func (s *Server) Run() error {
-	globalMux := http.NewServeMux()
-	r, err := s.router()
-	if err != nil {
-		return err
-	}
-	globalMux.Handle("/", r)
-
-	srv := &http.Server{
-		Addr:    s.config.ListenAddr,
-		Handler: globalMux,
-	}
-
-	logrus.WithFields(logrus.Fields{
-		"addr":           s.config.ListenAddr,
-		"updateInterval": s.config.UpdateInterval,
-	}).Info("api started")
-
 	// start ticker
 	t := time.NewTicker(s.config.UpdateInterval)
 	go func() {
@@ -41,28 +23,30 @@ func (s *Server) Run() error {
 	go func() {
 		for {
 			item := <-s.updateChan
-			logrus.Debugf("update: %+v", item)
-			// TODO: send to discord
+			logrus.WithFields(logrus.Fields{
+				"appID": item.AppID,
+				"gid":   item.Gid,
+				"date":  time.Now(),
+			}).Debugf("app update")
+			// send to discord
 			if err := s.sendToDiscord(item); err != nil {
 				logrus.Errorf("error sending to discord: %s", err)
 			}
 		}
 	}()
 
-	if s.discord != nil {
-		user, err := s.discord.User("@me")
-		if err != nil {
-			return err
-		}
-		s.discordUser = user
-
-		// add handler
-		s.discord.AddHandler(s.messageCreateHandler)
-	}
-
-	if err := srv.ListenAndServe(); err != nil {
+	// ensure connected
+	if err := s.ensureConnectionToDiscord(); err != nil {
 		return err
 	}
+	user, err := s.discord.User("@me")
+	if err != nil {
+		return err
+	}
+	s.discordUser = user
+
+	// add handler
+	s.discord.AddHandler(s.messageCreateHandler)
 
 	return nil
 }

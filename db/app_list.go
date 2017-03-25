@@ -114,40 +114,23 @@ func (d *DB) GetAppList() ([]*types.AppInfo, error) {
 	return apps, nil
 }
 
-// GetAppInfo returns the info for the specified application
-func (d *DB) GetAppInfo(appID string) (*types.AppInfo, error) {
-	info := &types.AppInfo{}
+// IsValidID returns whether the specified application id is known or not
+func (d *DB) IsValidID(appID string) (bool, error) {
+	valid := false
 	if err := d.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(dbBucketAppList))
-		// TODO: improve this lookup; separate table?
+		// TODO: optimize; separate bucket?
 		b.ForEach(func(k, v []byte) error {
 			if string(v) == appID {
-				i, err := getAppInfo(k, v)
-				if err != nil {
-					return err
-				}
-
-				info = i
+				valid = true
 				return nil
 			}
-
 			return nil
 		})
 		return nil
 	}); err != nil {
-		return nil, err
+		return valid, err
 	}
 
-	return info, nil
-}
-
-func getAppInfo(k, v []byte) (*types.AppInfo, error) {
-	appID, err := strconv.Atoi(string(v))
-	if err != nil {
-		return nil, err
-	}
-	return &types.AppInfo{
-		Name:  string(k),
-		AppID: appID,
-	}, nil
+	return valid, nil
 }

@@ -1,0 +1,48 @@
+hash: 23b30a702783fd885702be11719f32915f8a83aef17a6fc633e6d96c3231bb17
+updated: 2017-03-24T10:08:56.880178437-04:00
+imports:
+- name: github.com/boltdb/bolt
+  version: 583e8937c61f1af6513608ccc75c97b6abdf4ff9
+- name: github.com/bwmarrin/discordgo
+  version: 5835676872d7fa65ee37b32672079c4ede2c1855
+- name: github.com/docker/docker
+  version: d2532c636f03ea12744c4aec62562d78e5cde8ae
+  subpackages:
+  - pkg/homedir
+  - pkg/idtools
+  - pkg/system
+- name: github.com/docker/go-units
+  version: 9b001659dd36225e356b4467c465d732e745f53d
+- name: github.com/gorilla/websocket
+  version: a91eba7f97777409bc2c443f5534d41dd20c5720
+- name: github.com/jaytaylor/html2text
+  version: f3b8a7ca0a23f0a806b2e1ad1247de39ecde54bf
+- name: github.com/Microsoft/go-winio
+  version: fff283ad5116362ca252298cfc9b95828956d85d
+- name: github.com/opencontainers/runc
+  version: c139a7c76178b9065d9ab299e6a59b0442a53b6d
+  subpackages:
+  - libcontainer/user
+- name: github.com/sirupsen/logrus
+  version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
+- name: github.com/ssor/bom
+  version: 6ed919a936d5ab554e4b40bc51f7c522488122c6
+- name: github.com/urfave/cli
+  version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
+- name: golang.org/x/crypto
+  version: 459e26527287adbc2adcc5d0d49abff9a5f315a7
+  subpackages:
+  - nacl/secretbox
+  - poly1305
+  - salsa20/salsa
+- name: golang.org/x/net
+  version: d379faa25cbdc04d653984913a2ceb43b0bc46d7
+  subpackages:
+  - html
+  - html/atom
+- name: golang.org/x/sys
+  version: 076b546753157f758b316e59bcb51e6807c04057
+  subpackages:
+  - unix
+  - windows
+testImports: []

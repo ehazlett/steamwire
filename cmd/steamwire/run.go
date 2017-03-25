@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/ehazlett/steamwire/server"
 	"github.com/ehazlett/steamwire/version"
@@ -16,7 +15,7 @@ func runAction(c *cli.Context) error {
 	discordToken := c.GlobalString("discord-token")
 	discordChannel := c.GlobalString("discord-channel-id")
 
-	if discordToken == "" || discordChannel == "" && os.Getenv("STEAMWIRE_DEBUG") == "" {
+	if discordToken == "" || discordChannel == "" {
 		help := `
     ------------------------------------------------------
     Please visit https://github.com/ehazlett/steamwire/blob/master/docs/install.md
@@ -34,7 +33,6 @@ func runAction(c *cli.Context) error {
 	}
 
 	cfg := &server.Config{
-		ListenAddr:       c.GlobalString("listen-addr"),
 		UpdateInterval:   c.GlobalDuration("update-interval"),
 		DBPath:           c.GlobalString("db-path"),
 		DiscordToken:     discordToken,
@@ -46,5 +44,11 @@ func runAction(c *cli.Context) error {
 		return err
 	}
 
-	return srv.Run()
+	if err := srv.Run(); err != nil {
+		return err
+	}
+
+	// wait for interrupt
+	<-make(chan struct{})
+	return nil
 }

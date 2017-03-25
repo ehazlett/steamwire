@@ -1,9 +1,25 @@
 package db
 
-import "github.com/boltdb/bolt"
+import (
+	"fmt"
+	"strconv"
+
+	"github.com/boltdb/bolt"
+	"github.com/ehazlett/steamwire/types"
+)
 
 // AddApp adds an application ID to the database
 func (d *DB) AddApp(appID string) error {
+	// validate
+	valid, err := d.IsValidID(appID)
+	if err != nil {
+		return err
+	}
+
+	if !valid {
+		return fmt.Errorf("%s is not a valid app id", appID)
+	}
+
 	return d.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(dbBucketApps))
 		return b.Put([]byte(appID), nil)
@@ -57,4 +73,42 @@ func (d *DB) GetApps() ([]string, error) {
 	}
 
 	return apps, nil
+}
+
+// GetAppInfo returns the info for the specified application
+func (d *DB) GetAppInfo(appID string) (*types.AppInfo, error) {
+	info := &types.AppInfo{}
+	if err := d.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(dbBucketAppList))
+		// TODO: improve this lookup; separate table?
+		b.ForEach(func(k, v []byte) error {
+			if string(v) == appID {
+				i, err := getAppInfo(k, v)
+				if err != nil {
+					return err
+				}
+
+				info = i
+				return nil
+			}
+
+			return nil
+		})
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+
+	return info, nil
+}
+
+func getAppInfo(k, v []byte) (*types.AppInfo, error) {
+	appID, err := strconv.Atoi(string(v))
+	if err != nil {
+		return nil, err
+	}
+	return &types.AppInfo{
+		Name:  string(k),
+		AppID: appID,
+	}, nil
 }

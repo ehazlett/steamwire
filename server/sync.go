@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/ehazlett/steamwire/types"
@@ -17,56 +18,66 @@ func (s *Server) sync() error {
 	wg := &sync.WaitGroup{}
 	for _, app := range apps {
 		wg.Add(1)
-		go s.updateNewsForApp(app, wg, s.updateChan)
+		go s.syncNews(app, wg, s.updateChan)
 	}
 
 	wg.Wait()
 	return nil
 }
 
-func (s *Server) updateNewsForApp(appID string, wg *sync.WaitGroup, ch chan (*types.NewsItem)) {
+func (s *Server) syncNews(appID string, wg *sync.WaitGroup, ch chan (*types.NewsItem)) {
 	defer wg.Done()
 
 	appNews, err := s.getNews(appID)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"appID": appID,
-		}).Errorf("unable to update news for app: %s", err)
+		}).Error("unable to update news for app")
 		return
 	}
 
-	if len(appNews.NewsItems) == 0 {
+	items := appNews.NewsItems
+	if len(items) == 0 {
 		logrus.WithFields(logrus.Fields{
 			"appID": appID,
-		}).Warnf("no news items in update")
+		}).Debugf("no news items in update")
 		return
 	}
+	item := items[0]
 
-	current, err := s.ds.GetAppIndex(appID)
+	updated, err := s.updateNewsForApp(appID, item)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"appID": appID,
-		}).Errorf("error getting current app index: %s", err)
+		}).Errorf("error syncing news for app")
 		return
 	}
 
-	item := appNews.NewsItems[0]
+	// update
+	if updated {
+		ch <- item
+	}
+}
+
+// updateNewsForApp sets the latest update index for the app and returns
+// whether or not it was updated
+func (s *Server) updateNewsForApp(appID string, item *types.NewsItem) (bool, error) {
+	current, err := s.ds.GetAppIndex(appID)
+	if err != nil {
+		return false, fmt.Errorf("error getting current app index: %s", err)
+	}
+
 	if item.Gid == current {
 		logrus.WithFields(logrus.Fields{
 			"appID":   appID,
 			"gid":     item.Gid,
 			"current": current,
 		}).Debug("news for app is current")
-		return
+		return false, nil
 	}
 	if err := s.ds.UpdateAppIndex(appID, item.Gid); err != nil {
-		logrus.WithFields(logrus.Fields{
-			"appID": appID,
-			"gid":   item.Gid,
-		}).Errorf("error updating news index: %s", err)
-		return
+		return false, fmt.Errorf("error updating news index: %s", err)
 	}
 
-	// update
-	ch <- item
+	return true, nil
 }
