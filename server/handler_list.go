@@ -15,18 +15,18 @@ func (s *Server) processListMessage(author *discordgo.User, terms []string) (*ha
 		"author": author.Username,
 	}).Debug("handling list message")
 
+	if len(apps) == 0 {
+		return &handlerResponse{
+			Content: fmt.Sprintf("<@!%s> There are no monitored applications.", author.ID),
+		}, nil
+	}
+
 	apps, err := s.ds.GetApps()
 	if err != nil {
 		return &handlerResponse{
 			Title:   errTitle,
 			Content: errMessage,
 		}, err
-	}
-
-	if len(apps) == 0 {
-		return &handlerResponse{
-			Content: fmt.Sprintf("<@!%s> There are no monitored applications.", author.ID),
-		}, nil
 	}
 
 	info := []*types.AppInfo{}

@@ -11,13 +11,6 @@ func (s *Server) processAddMessage(author *discordgo.User, terms []string) (*han
 	logrus.WithFields(logrus.Fields{
 		"author": author.Username,
 	}).Debug("handling add message")
-	// ensure app list is updated
-	if err := s.updateAppList(false); err != nil {
-		return &handlerResponse{
-			Title:   errTitle,
-			Content: errMessage,
-		}, err
-	}
 	// make sure an id is specified
 	if len(terms) == 0 {
 		return &handlerResponse{
@@ -27,6 +20,13 @@ func (s *Server) processAddMessage(author *discordgo.User, terms []string) (*han
 	}
 
 	appID := terms[0]
+	// ensure app list is updated
+	if err := s.updateAppList(false); err != nil {
+		return &handlerResponse{
+			Title:   errTitle,
+			Content: errMessage,
+		}, err
+	}
 
 	info, err := s.ds.GetAppInfo(appID)
 	if err != nil {
